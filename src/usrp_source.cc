@@ -43,11 +43,12 @@ extern int g_verbosity;
 
 usrp_source::usrp_source(float sample_rate,
 			long int fpga_master_clock_freq,
-			bool external_ref) {
+			bool external_ref, bool gpsdo_ref) {
 
 	m_desired_sample_rate = sample_rate;
 	m_fpga_master_clock_freq = fpga_master_clock_freq;
 	m_external_ref = external_ref;
+	m_gpsdo_ref = gpsdo_ref;
 	m_sample_rate = 0.0;
 	m_dev.reset();
 	m_cb = new circular_buffer(CB_LEN, sizeof(complex), 0);
@@ -165,7 +166,9 @@ int usrp_source::open(char *subdev) {
 		m_dev->set_rx_rate(m_desired_sample_rate);
 		m_sample_rate = m_dev->get_rx_rate();
 
-		if (m_external_ref)
+		if (m_gpsdo_ref)
+			m_dev->set_clock_source("gpsdo");
+		else if (m_external_ref)
 			m_dev->set_clock_source("external");
 
 		if(g_verbosity > 1) {

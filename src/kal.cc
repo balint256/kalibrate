@@ -98,12 +98,12 @@ int main(int argc, char **argv) {
 	int c, antenna = 1, bi = BI_NOT_DEFINED, chan = -1, bts_scan = 0;
 	char *subdev = NULL;
 	long int fpga_master_clock_freq = 0;
-	bool external_ref = false;
+	bool external_ref = false, gpsdo_ref = false;
 	float gain = 0.45;
 	double freq = -1.0, fd;
 	usrp_source *u;
 
-	while((c = getopt(argc, argv, "f:c:s:b:R:A:g:F:xvDh?")) != EOF) {
+	while((c = getopt(argc, argv, "f:c:s:b:R:A:g:F:xGvDh?")) != EOF) {
 		switch(c) {
 			case 'f':
 				freq = strtod(optarg, 0);
@@ -175,6 +175,10 @@ int main(int argc, char **argv) {
 				external_ref = true;
 				break;
 
+			case 'G':
+				gpsdo_ref = true;
+				break;
+
 			case 'v':
 				g_verbosity++;
 				break;
@@ -233,7 +237,7 @@ int main(int argc, char **argv) {
 	}
 
 	// let the device decide on the decimation
-	u = new usrp_source(GSM_RATE, fpga_master_clock_freq, external_ref);
+	u = new usrp_source(GSM_RATE, fpga_master_clock_freq, external_ref, gpsdo_ref);
 	if(!u) {
 		fprintf(stderr, "error: usrp_source\n");
 		return -1;
